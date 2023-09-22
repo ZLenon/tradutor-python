@@ -21,8 +21,7 @@ def index():
                 "translate_from": do,
                 "translate_to": para,
             }
-        )
-        history_entry.save()
+        ).save()
 
         return render_template(
             "index.html",
