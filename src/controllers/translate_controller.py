@@ -1,60 +1,57 @@
 from flask import Blueprint, render_template, request
-from deep_translator import GoogleTranslator
 from models.language_model import LanguageModel
+from deep_translator import GoogleTranslator
 
 translate_controller = Blueprint("translate_controller", __name__)
 
 
 @translate_controller.route("/", methods=["GET", "POST"])
 def index():
-    available_languages = LanguageModel.list_dicts()
+    languages = LanguageModel.list_dicts()
 
     if request.method == "POST":
         text_to_translate = request.form.get("text-to-translate")
-        source_language = request.form.get("source-language")
-        target_language = request.form.get("target-language")
+        translate_from = request.form.get("translate-from")
+        translate_to = request.form.get("translate-to")
 
-        translated_text = GoogleTranslator(
-            source=source_language, target=target_language
+        translated = GoogleTranslator(
+            source=translate_from, target=translate_to
         ).translate(text_to_translate)
 
         return render_template(
             "index.html",
-            available_languages=available_languages,
-            input_text=text_to_translate,
-            source_language=source_language,
-            target_language=target_language,
-            translated_text=translated_text,
+            languages=languages,
+            text_to_translate=text_to_translate,
+            translate_from=translate_from,
+            translate_to=translate_to,
+            translated=translated,
         )
-    else:
-        translated_text = "Tradução"
 
+    else:
+        translated = "Tradução"
     return render_template(
-        "index.html",
-        available_languages=available_languages,
-        translated_text=translated_text,
+        "index.html", languages=languages, translated=translated
     )
 
 
 @translate_controller.route("/reverse", methods=["POST"])
 def reverse():
-    available_languages = LanguageModel.list_dicts()
+    languages = LanguageModel.list_dicts()
     text_to_translate = request.form.get("text-to-translate")
-    source_language = request.form.get("source-language")
-    target_language = request.form.get("target-language")
+    translate_from = request.form.get("translate-from")
+    translate_to = request.form.get("translate-to")
 
-    # Troca as linguagens de origem e destino
-    source_language, target_language = target_language, source_language
+    translate_from, translate_to = translate_to, translate_from
 
     translator = GoogleTranslator(
-        source="auto", target=source_language
+        source="auto", target=translate_from
     ).translate(text_to_translate)
 
     return render_template(
         "index.html",
-        available_languages=available_languages,
-        input_text=text_to_translate,
-        source_language=source_language,
-        target_language=target_language,
-        translated_text=translator,
+        languages=languages,
+        text_to_translate=text_to_translate,
+        translate_from=translate_from,
+        translate_to=translate_to,
+        translated=translator,
     )
