@@ -20,7 +20,7 @@ def test_request_history():
             "translate_to": "pt",
         },
         {
-            "text_to_translate": "I play the guitar, but i dont play the piano",
+            "text_to_translate": "I play the guitar, but i dont play other",
             "translate_from": "en",
             "translate_to": "pt",
         },
