@@ -15,7 +15,7 @@ def index():
         do = request.form.get("translate-from")
         para = request.form.get("translate-to")
         traduzido = GoogleTranslator(source=do, target=para).translate(texto)
-        history_entry = HistoryModel(
+        HistoryModel(
             {
                 "text_to_translate": texto,
                 "translate_from": do,
@@ -26,16 +26,19 @@ def index():
 
         return render_template(
             "index.html",
-            languages=dialeto,
             text_to_translate=texto,
+            translated=traduzido,
+            languages=dialeto,
             translate_from=do,
             translate_to=para,
-            translated=traduzido,
         )
-    else:
-        traduzido = "Tradução"
     return render_template(
-        "index.html", languages=dialeto, translated=traduzido
+        "index.html",
+        languages=dialeto,
+        text_to_translate="what's your name?",
+        translate_from="en",
+        translate_to="pt",
+        translated="Tradução",
     )
 
 
@@ -44,7 +47,7 @@ def reverse():
     texto = request.form.get("text-to-translate")
     do = request.form.get("translate-from")
     para = request.form.get("translate-to")
-    traduzido = GoogleTranslator(source=do, target=para).translate(texto)
+    traduzido = GoogleTranslator(source="auto", target=para).translate(texto)
     HistoryModel(
         {
             "text_to_translate": texto,
@@ -55,9 +58,9 @@ def reverse():
 
     return render_template(
         "index.html",
-        languages=dialeto,
         text_to_translate=traduzido,
         translate_from=para,
-        translate_to=do,
+        languages=dialeto,
         translated=texto,
+        translate_to=do,
     )
