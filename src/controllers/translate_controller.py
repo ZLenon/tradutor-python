@@ -5,11 +5,11 @@ from deep_translator import GoogleTranslator
 
 
 translate_controller = Blueprint("translate_controller", __name__)
+dialeto = LanguageModel.list_dicts()
 
 
 @translate_controller.route("/", methods=["GET", "POST"])
 def index():
-    dialeto = LanguageModel.list_dicts()
     if request.method == "POST":
         texto = request.form.get("text-to-translate")
         do = request.form.get("translate-from")
@@ -33,19 +33,14 @@ def index():
             translated=traduzido,
         )
     else:
-        return render_template(
-            "index.html",
-            languages=dialeto,
-            text_to_translate="candy",
-            translate_from="en",
-            translate_to="pt",
-            translated="doçe",
-        )
+        traduzido = "Tradução"
+    return render_template(
+        "index.html", languages=dialeto, translated=traduzido
+    )
 
 
 @translate_controller.route("/reverse", methods=["POST"])
 def reverse():
-    dialeto = LanguageModel.list_dicts()
     texto = request.form.get("text-to-translate")
     do = request.form.get("translate-from")
     para = request.form.get("translate-to")
