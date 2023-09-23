@@ -1,30 +1,31 @@
 from src.models.history_model import HistoryModel
 from src.models.user_model import UserModel
 
-# ================MOCK=============================
+# ================MOCK=================================
 mock_traducao = {
     "text_to_translate": "Hello, I like videogame",
     "translate_from": "en",
     "translate_to": "pt",
 }
-usuario_mock = {"name": "usuario123", "token": "abcdwzas454646"}
+mock_usuario = {"name": "administrador", "token": "coxina_123"}
+mock_name = {"name": "administrador"}
+status_ok = 204
 
 
-# ================TEST=============================
+# ===============TEST===================================
 def test_history_delete(app_test):
-    history = HistoryModel(mock_traducao).save()
+    h = HistoryModel(mock_traducao).save()
+    UserModel(mock_usuario).save()
+    um_usuario = UserModel.find_one(mock_name)
 
-    UserModel(usuario_mock).save()
-
-    um_usuario = UserModel.find_one({"name": "usuario123"})
-
-    res_post = app_test.delete(
-        f"/admin/history/{history.data['_id']}",
+    r = app_test.delete(
+        f"/admin/history/{h.data['_id']}",
         headers={
-            "Authorization": um_usuario.data["abcdwzas454646"],
+            "Authorization": um_usuario.data["coxina_123"],
             "User": um_usuario.data["name"],
         },
     )
 
-    assert res_post.status_code == 204
-    assert HistoryModel.find_one({"_id": history.data["_id"]}) is None
+    assert r.status_code == status_ok
+    dell = HistoryModel.find_one({"_id": h.data["_id"]})
+    assert dell is None
