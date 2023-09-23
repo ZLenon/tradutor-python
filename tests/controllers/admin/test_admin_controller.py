@@ -7,18 +7,18 @@ mock_traducao = {
     "translate_from": "en",
     "translate_to": "pt",
 }
-mock_usuario = {"name": "administrador", "token": "coxina_123"}
-mock_name = {"name": "administrador"}
+mock_usuario = {"name": "Admin", "token": "coxina_123"}
+mock_name = {"name": "Admin"}
 status_ok = 204
 
 
 # ===============TEST===================================
-def test_history_delete(app_test):
+def test_history_delete(path_url):
     h = HistoryModel(mock_traducao).save()
     UserModel(mock_usuario).save()
     um_usuario = UserModel.find_one(mock_name)
 
-    r = app_test.delete(
+    r = path_url.delete(
         f"/admin/history/{h.data['_id']}",
         headers={
             "Authorization": um_usuario.data["coxina_123"],
