@@ -1,31 +1,33 @@
+import json
 from src.models.history_model import HistoryModel
-from src.models.user_model import UserModel
 
-# ================MOCK=================================
-mock_traducao = {
-    "text_to_translate": "Hello, I like videogame",
-    "translate_from": "en",
-    "translate_to": "pt",
-}
-mock_usuario = {"name": "administrador", "token": "coxina_123"}
-mock_name = {"name": "administrador"}
-status_ok = 204
+# from src.models.user_model import UserModel
 
 
-# ===============TEST===================================
 def test_history_delete(app_test):
-    h = HistoryModel(mock_traducao).save()
-    UserModel(mock_usuario).save()
-    um_usuario = UserModel.find_one(mock_name)
+    # Verifica se os dados foram inseridos corretamente no banco de dados
+    historicos = list(HistoryModel.find_all())
+    assert len(historicos) == 2
 
-    r = app_test.delete(
-        f"/admin/history/{h.data['_id']}",
-        headers={
-            "Authorization": um_usuario.data["coxina_123"],
-            "User": um_usuario.data["name"],
-        },
-    )
+    # Testa a rota para obter todos os registros de histórico
+    res_one = app_test.get("/admin/history")
+    assert res_one.status_code == 200
+    data_one = json.loads(res_one.data)
+    assert len(data_one) == 2
 
-    assert r.status_code == status_ok
-    dell = HistoryModel.find_one({"_id": h.data["_id"]})
-    assert dell is None
+    # Testa a exclusão de um registro de histórico
+    res_two = app_test.delete("/admin/history/1")
+    assert res_two.status_code == 204
+    historico_two = HistoryModel.find_one({"_id": 1})
+    assert historico_two is None
+
+    # Testa a atualização de um registro de histórico
+    data = {
+        "text_to_translate": "Updated text",
+        "translate_from": "en",
+        "translate_to": "pt",
+    }
+    res_three = app_test.put("/admin/history/1", data=data)
+    assert res_three.status_code == 200
+    historico_three = HistoryModel.find_one({"_id": 1})
+    assert historico_three["text_to_translate"] == "Updated text"
